@@ -38,6 +38,7 @@ public class MazeBuilder : MonoBehaviour
         maze.BuildMazeData();
         BuildMaze();
         CombineMeshes();
+        //CombineSubMeshes();
     }
 
     private void BuildMaze()
@@ -241,24 +242,29 @@ public class MazeBuilder : MonoBehaviour
         }
     }
 
-    private void CombineMeshByUnity()
+    private void CombineSubMeshes()
     {
         int count = subMeshes.Count;
         CombineInstance[] combine = new CombineInstance[count];
-        Debug.Log(count);
-
-        int i = 0;
-        while (i < count)
-        {
-            combine[i].mesh = subMeshes[i].sharedMesh;
-            combine[i].transform = subMeshes[i].transform.localToWorldMatrix;
-            subMeshes[i].gameObject.SetActive(false);
-            i++;
-        }
-        transform.GetComponent<MeshFilter>().mesh.subMeshCount = count + 1;
-        Debug.Log(transform.GetComponent<MeshFilter>().mesh.subMeshCount);
+        // collect walls
+        combine[0].mesh = subMeshes[0].sharedMesh;
+        combine[0].transform = subMeshes[0].transform.localToWorldMatrix;
+        subMeshes[0].gameObject.SetActive(false);
+        // collect floors
+        combine[1].mesh = subMeshes[0].sharedMesh;
+        combine[1].transform = subMeshes[0].transform.localToWorldMatrix;
+        subMeshes[1].gameObject.SetActive(false);
+        // collect outer walls
+        combine[2].mesh = subMeshes[0].sharedMesh;
+        combine[2].transform = subMeshes[0].transform.localToWorldMatrix;
+        subMeshes[2].gameObject.SetActive(false);
+        // combine into one
         transform.GetComponent<MeshFilter>().mesh = new Mesh();
+        transform.GetComponent<MeshFilter>().mesh.subMeshCount = count + 1;
         transform.GetComponent<MeshFilter>().mesh.CombineMeshes(combine, false);
+        // don't forget to apply mesh collider
+        transform.GetComponent<MeshCollider>().sharedMesh = null;
+        transform.GetComponent<MeshCollider>().sharedMesh = transform.GetComponent<MeshFilter>().mesh;
         transform.gameObject.SetActive(true);
     }
 
