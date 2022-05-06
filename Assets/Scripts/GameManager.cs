@@ -13,6 +13,8 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private Text timerText = null;
     [SerializeField]
+    private Text levelName = null;
+    [SerializeField]
     private CanvasRenderer[] levelButtonsExceptForIntroLevel = null;
     [SerializeField]
     BallTouchMover ballTouchMover = null;
@@ -46,6 +48,11 @@ public class GameManager : MonoBehaviour
         if(timeToCompleteText != null)
         {
             timeToCompleteText.text = FormatTime(timeToComplete);
+        }
+        // set scene name on the dashboard
+        if (levelName != null)
+        {
+            levelName.text = SceneManager.GetActiveScene().name;
         }
         sceneCount = SceneManager.sceneCountInBuildSettings;
         thisSceneIndex = SceneManager.GetActiveScene().buildIndex;
@@ -179,10 +186,15 @@ public class GameManager : MonoBehaviour
     private void TimeCounter()
     {
         timer = Time.time - startTime;
-        timerText.text = FormatTime(timer);
+        timerText.text = FormatTime(timer) + " / " + FormatTime((float)timeToComplete);
         if(timer > timeToComplete)
         {
             CallGameOver();
+        }
+        if( (timeToComplete - timer < 10 ) && (timerText.color != Color.red) )
+        {
+            timerText.color = Color.red;
+            timerText.fontStyle = FontStyle.Bold;
         }
     }
 
